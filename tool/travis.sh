@@ -15,5 +15,5 @@ dartanalyzer $DARTANALYZER_FLAGS \
   lib/coverage.dart
 
 # Run the tests.
-# echo "Running tests..."
-# dart -c test/all_tests.dart
+echo "Running tests..."
+dart --checked test/collect_coverage_test.dart
