@@ -17,3 +17,13 @@ dartanalyzer $DARTANALYZER_FLAGS \
 # Run the tests.
 echo "Running tests..."
 dart --checked test/collect_coverage_test.dart
+
+# Install dart_coveralls; gather and send coverage data.
+if [ "$COVERALLS_TOKEN" ] && [ "$TRAVIS_DART_VERSION" = "stable" ]; then
+  pub global activate dart_coveralls
+  pub global run dart_coveralls report \
+    --token $COVERALLS_TOKEN \
+    --retry 2 \
+    --exclude-test-files \
+    test/collect_coverage_test.dart
+fi
