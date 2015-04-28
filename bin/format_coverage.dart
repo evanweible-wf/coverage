@@ -15,6 +15,7 @@ class Environment {
   String pkgRoot;
   String input;
   IOSink output;
+  String include;
   int workers;
   bool prettyPrint;
   bool lcov;
@@ -46,9 +47,9 @@ main(List<String> arguments) {
     var resolver = new Resolver(packageRoot: env.pkgRoot, sdkRoot: env.sdkRoot);
     var loader = new Loader();
     if (env.prettyPrint) {
-      out = new PrettyPrintFormatter(resolver, loader).format(hitmap);
+      out = new PrettyPrintFormatter(resolver, loader).format(hitmap, include: env.include);
     } else if (env.lcov) {
-      out = new LcovFormatter(resolver).format(hitmap);
+      out = new LcovFormatter(resolver).format(hitmap, include: env.include);
     }
 
     out.then((output) {
@@ -85,6 +86,7 @@ parseArgs(List<String> arguments) {
   parser.addOption('in', abbr: 'i', help: 'input(s): may be file or directory');
   parser.addOption('out',
       abbr: 'o', defaultsTo: 'stdout', help: 'output: may be file or stdout');
+  parser.addOption('include', help: 'include: which directory of files to include in the coverage report');
   parser.addOption('workers',
       abbr: 'j', defaultsTo: '1', help: 'number of workers');
   parser.addFlag('pretty-print',
@@ -153,6 +155,8 @@ parseArgs(List<String> arguments) {
     var outfile = new File(outpath)..createSync(recursive: true);
     env.output = outfile.openWrite();
   }
+
+  env.include = args['include'];
 
   env.lcov = args['lcov'];
   if (args['pretty-print'] && env.lcov) {

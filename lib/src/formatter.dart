@@ -13,7 +13,7 @@ class LcovFormatter implements Formatter {
   final Resolver resolver;
   LcovFormatter(this.resolver);
 
-  Future<String> format(Map hitmap) {
+  Future<String> format(Map hitmap, {String include}) {
     var buf = new StringBuffer();
     var emitOne = (key) {
       var v = hitmap[key];
@@ -26,6 +26,8 @@ class LcovFormatter implements Formatter {
         print('Warning: couldn\'t resolve $key');
       }
       if (source == null) {
+        return new Future.value();
+      } else if (include != null && !(new File(source).absolute.path.startsWith(new File(include).absolute.path))) {
         return new Future.value();
       }
       entry.write('SF:${source}\n');
@@ -53,7 +55,7 @@ class PrettyPrintFormatter implements Formatter {
   final Loader loader;
   PrettyPrintFormatter(this.resolver, this.loader);
 
-  Future<String> format(Map hitmap) {
+  Future<String> format(Map hitmap, {String include}) {
     var buf = new StringBuffer();
     var emitOne = (key) {
       var v = hitmap[key];
@@ -66,6 +68,8 @@ class PrettyPrintFormatter implements Formatter {
         print('Warning: couldn\'t resolve $key');
       }
       if (uri == null) {
+        c.complete();
+      } else if (include != null && !(new File(uri).absolute.path.startsWith(new File(include).absolute.path))) {
         c.complete();
       } else {
         loader.load(uri).then((lines) {
