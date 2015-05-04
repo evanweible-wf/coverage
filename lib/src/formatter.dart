@@ -28,7 +28,8 @@ class LcovFormatter implements Formatter {
       }
       if (source == null) {
         return new Future.value();
-      } else if (reportOn != null && reportOnPaths.where((p) => source.startsWith(p)).length == 0) {
+      } else if (reportOn != null && reportOn.length > 0 &&
+                 reportOnPaths.where((p) => source.startsWith(p)).length == 0) {
         return new Future.value();
       }
       entry.write('SF:${source}\n');
