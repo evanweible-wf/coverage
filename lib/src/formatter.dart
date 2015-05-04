@@ -13,13 +13,16 @@ class LcovFormatter implements Formatter {
   final Resolver resolver;
   LcovFormatter(this.resolver);
 
-  Future<String> format(Map hitmap) {
+  Future<String> format(Map hitmap, {List<String> reportOn}) {
     var buf = new StringBuffer();
+    var reportOnPaths = reportOn != null ? reportOn.map((path) => new File(path).absolute.path) : [];
     var emitOne = (key) {
       var v = hitmap[key];
       StringBuffer entry = new StringBuffer();
       var source = resolver.resolve(key);
       if (source == null) {
+        return new Future.value();
+      } else if (reportOn != null && reportOnPaths.where((p) => source.startsWith(p)).length == 0) {
         return new Future.value();
       }
       entry.write('SF:${source}\n');
@@ -47,14 +50,17 @@ class PrettyPrintFormatter implements Formatter {
   final Loader loader;
   PrettyPrintFormatter(this.resolver, this.loader);
 
-  Future<String> format(Map hitmap) {
+  Future<String> format(Map hitmap, {List<String> reportOn}) {
     var buf = new StringBuffer();
+    var reportOnPaths = reportOn != null ? reportOn.map((path) => new File(path).absolute.path) : [];
     var emitOne = (key) {
       var v = hitmap[key];
       var c = new Completer();
       var uri = resolver.resolve(key);
       if (uri == null) {
         c.complete();
+      } else if (reportOn != null && reportOnPaths.where((p) => uri.startsWith(p)).length == 0) {
+        return new Future.value();
       } else {
         loader.load(uri).then((lines) {
           if (lines == null) {
