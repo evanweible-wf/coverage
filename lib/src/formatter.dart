@@ -16,6 +16,7 @@ class LcovFormatter implements Formatter {
   Future<String> format(Map hitmap, {List<String> reportOn}) {
     var buf = new StringBuffer();
     var reportOnPaths = reportOn != null ? reportOn.map((path) => new File(path).absolute.path) : [];
+    print(reportOnPaths);
     var emitOne = (key) {
       var v = hitmap[key];
       StringBuffer entry = new StringBuffer();
@@ -26,6 +27,7 @@ class LcovFormatter implements Formatter {
         // Couldn't resolve a file
         print('Warning: couldn\'t resolve $key');
       }
+      print(reportOnPaths.where((p) => source.startsWith(p)));
       if (source == null) {
         return new Future.value();
       } else if (reportOn != null && reportOnPaths.where((p) => source.startsWith(p)).length == 0) {
